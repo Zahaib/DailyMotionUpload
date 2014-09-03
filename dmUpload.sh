@@ -1,10 +1,10 @@
 #!/bin/bash
 
-client_id="ecbef8150cee10b947e3"
-client_secret="005a7ce8a946d8f36caad05222ebda0d5a0b3484"
-username="johanna-facepholat"
-password="facephopass"
-scope="read+write"
+#client_id="<CLIENT ID>"
+#client_secret="<CLIENT SECRET>"
+#username="<USERNAME>"
+#password="<PASSWORD>"
+#scope="<SCOPE>"
 
 curl -s --output out.txt --data 'grant_type=password&client_id='$client_id'&client_secret='$client_secret'&username='$username'&password='$password'&scope='$scope'' https://api.dailymotion.com/oauth/token
 
