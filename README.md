@@ -8,6 +8,3 @@ Just add the client_id, client_secret, username, password and scope details to c
 ###Usage
 ```bash 
 	./dmUpload.sh
-
-	
-
