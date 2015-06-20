@@ -1,5 +1,5 @@
 #!/bin/bash
-[ "$#" -lt 6 ] && { echo "Usage: $(basename $0) video.mp4 -u=username -p=password -k=api_key -s=api_secret -c=category [ -t=title ] [ -l=language ] [ tag,another tag ]
+[ "$#" -lt 6 ] && { echo "Usage: $(basename $0) video.mp4 -u=username -p=password -k=api_key -s=api_secret -c=category [ -t=\"title\" ] [ -l=language ] [ tag,another tag ]
 
 If no title is specified, the filename (without extension) is used as title.
 Default language is english (en)."; exit 1; }
