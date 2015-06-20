@@ -5,7 +5,7 @@ If no title is specified, the filename (without extension) is used as title.
 Default language is english (en)."; exit 1; }
 
 while getopts :u:p:k:s:t:c:l: FLAG; do 
- case $FLAG in
+ case "$FLAG" in
   k)
    APIKEY="$OPTARG"
    ;;
