@@ -1,5 +1,5 @@
 #!/bin/bash
-[ "$#" -lt 11 -o "$#" lt 10 -o $1 = "--help" ] && { echo "Usage: $(basename $0) -u username -p password -k api_key -s api_secret -c category [ -t \"title\" ] [ -l language ] video.mp4 [ tag,another tag ]
+[ "$#" -lt 11 ] || [ "$#" lt 10 ] || [ "$1" = "--help" ] && { echo "Usage: $(basename $0) -u username -p password -k api_key -s api_secret -c category [ -t \"title\" ] [ -l language ] video.mp4 [ tag,another tag ]
 
 Options:
 --help	Show this extremely helpful message.
