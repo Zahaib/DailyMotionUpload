@@ -1,5 +1,9 @@
 #!/bin/bash
-[ "$#" -lt 6 ] && { echo "Usage: $(basename $0) -u username -p password -k api_key -s api_secret -c category [ -t \"title\" ] [ -l language ] [ tag,another tag ]  video.mp4
+[ "$#" -lt 11 -o $1 = "--help" ] && { echo "Usage: $(basename $0) -u username -p password -k api_key -s api_secret -c category [ -t \"title\" ] [ -l language ] [ tag,another tag ]  video.mp4
+
+Options:
+--help	Show this extremely helpful message.
+--
 
 If no title is specified, the filename (without extension) is used as title.
 Default language is english (en)."; exit 1; }
