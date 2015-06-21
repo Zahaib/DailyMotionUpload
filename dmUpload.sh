@@ -93,8 +93,7 @@ else
 	echo "Video uploaded with id $video_id" 
 fi
 }
-[ "$multi" = "" ] && FILE="$1"
-[ "$TITLE" = "" -a "$multi" = "" ] && TITLE="$(basename $1)" && TITLE="${TITLE%.*}"
+
 
 [ "$LANGUAGE" = "" ] && LANGUAGE=en
 shift
@@ -112,7 +111,9 @@ if [ "$multi" = "y" ]; then
   ul
  done
 else
+ FILE="$1"
  TAGS="$*"
+ [ "$TITLE" = "" ] && TITLE="$(basename $1)" && TITLE="${TITLE%.*}"
  ul
 fi
 
