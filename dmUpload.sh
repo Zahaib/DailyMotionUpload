@@ -1,12 +1,23 @@
 #!/bin/bash
-[ "$#" -lt 11 -o $1 = "--help" ] && { echo "Usage: $(basename $0) -u username -p password -k api_key -s api_secret -c category [ -t \"title\" ] [ -l language ] [ tag,another tag ]  video.mp4
+[ "$#" -lt 11 -o lt 10 -o $1 = "--help" ] && { echo "Usage: $(basename $0) -u username -p password -k api_key -s api_secret -c category [ -t \"title\" ] [ -l language ] video.mp4 [ tag,another tag ]
 
 Options:
 --help	Show this extremely helpful message.
---
+--multiple	Upload multiple videos
+
+To upload more than one video, run the program using the following syntax:
+$(basename $0) -u username -p password -k api_key -s api_secret -l language --multiple list1.txt list2.txt
+The text files must contain the following line for every video:
+
+\"title\" [ tag,another tag ] video.mp4 category
+
 
 If no title is specified, the filename (without extension) is used as title.
 Default language is english (en)."; exit 1; }
+
+lineclear() { echo -en "\r\033[K"; }
+SCOPE="read+write"
+echo "$*" | grep -q "\--multiple" && multi=y
 
 while getopts :u:p:k:s:t:c:l: FLAG; do 
  case "$FLAG" in
@@ -23,10 +34,10 @@ while getopts :u:p:k:s:t:c:l: FLAG; do
    PASSWORD="$OPTARG"
    ;;
   t)
-   TITLE="$OPTARG"
+   [ "$multi" = "" ] && TITLE="$OPTARG"
    ;;
   c)
-   CATEGORY="$OPTARG"
+   [ "$multi" = "" ] && CATEGORY="$OPTARG"
    ;;
   l)
    LANGUAGE="$OPTARG"
@@ -35,28 +46,8 @@ while getopts :u:p:k:s:t:c:l: FLAG; do
 done
 shift $((OPTIND-1))
 
-SCOPE="read+write"
-FILE="$1"
-[ "$TITLE" = "" ] && TITLE="$(basename $1)" && TITLE="${TITLE%.*}"
 
-[ "$LANGUAGE" = "" ] && LANGUAGE=en
-shift
-TAGS="$*"
-
-#TITLE=$(basename "$FILE")
-#TITLE="${TITLE%.*}" #<--- Same title as file's name
-
-lineclear() { echo -en "\r\033[K"; }
-
-
-#declare -a categories=('videogames' 'music' 'fun' 'shortfilms' 'news' 'sport' 'auto' 'animals' 'people' 'webcam' 'creation' 'school' 'lifestyle' 'tech' 'travel' 'tv');
-#random=$((RANDOM%${#categories[@]}-1))
-#CATEGORY=${categories[$random]} #<--- Randomly select a category
-
-
-#declare -a languages=('en' 'cn' 'ja' 'ru' 'tr' 'pt' 'fa' 'ko' 'it' 'da' 'ur' 'vi' 'pl' 'lv' 'id' 'he' 'fr');
-#random2=$((RANDOM%${#languages[@]}-1))
-#LANGUAGE=${languages[$random2]} #<--- Randomly select a language
+ul() {
 echo -n "Getting access token..."
 
 curl -s --output out.txt --data 'grant_type=password&client_id='$APIKEY'&client_secret='$APISECRET'&username='$USERNAME'&password='$PASSWORD'&scope='$SCOPE'' https://api.dailymotion.com/oauth/token
@@ -101,3 +92,37 @@ then
 else
 	echo "Video uploaded with id $video_id" 
 fi
+}
+[ "$multi" = "" ] && FILE="$1"
+[ "$TITLE" = "" -a "$multi" = "" ] && TITLE="$(basename $1)" && TITLE="${TITLE%.*}"
+
+[ "$LANGUAGE" = "" ] && LANGUAGE=en
+shift
+
+if [ "$multi" = "y" ]; then 
+ queue=$(cat $*)
+
+ until [ "$queue" = "" ];do
+  video="$(echo "$queue"  | sed -n '/^\s*$/!{p;q}')"
+  queue="$(echo "$queue" | sed '$ d')"
+  TITLE="$(echo "$video" | awk -F\" '{print $NF}')"
+  FILE="$(echo "$video" | awk '{print $(NF-1)}')"
+  TAGS="$(echo "$video" | sed "s/.*\"//;s/$FILE.*//")"
+  CATEGORY="$(echo "$video" | awk '{ print $NF })"
+  ul
+ done
+else
+ TAGS="$*"
+ ul
+fi
+
+
+
+#TITLE=$(basename "$FILE")
+#TITLE="${TITLE%.*}" #<--- Same title as file's name
+#declare -a categories=('videogames' 'music' 'fun' 'shortfilms' 'news' 'sport' 'auto' 'animals' 'people' 'webcam' 'creation' 'school' 'lifestyle' 'tech' 'travel' 'tv');
+#random=$((RANDOM%${#categories[@]}-1))
+#CATEGORY=${categories[$random]} #<--- Randomly select a category
+#declare -a languages=('en' 'cn' 'ja' 'ru' 'tr' 'pt' 'fa' 'ko' 'it' 'da' 'ur' 'vi' 'pl' 'lv' 'id' 'he' 'fr');
+#random2=$((RANDOM%${#languages[@]}-1))
+#LANGUAGE=${languages[$random2]} #<--- Randomly select a language
