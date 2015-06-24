@@ -107,7 +107,7 @@ until [ "$queue" = "" ];do
  TITLE="$(echo "$video" | awk -F\" '{print $NF}')"
  FILE="$(echo "$video" | awk '{print $(NF-1)}')"
  TAGS="$(echo "$video" | sed "s/.*\"//;s/$FILE.*//")"
- CATEGORY="$(echo "$video" | awk '{ print $NF })"
+ CATEGORY="$(echo "$video" | awk '{ print $NF }')"
  ul
 done
 } || {
