@@ -99,6 +99,7 @@ fi
 shift
 
 [ "$multi" = "y" ] && {
+set +u
 queue=$(cat $*)
 until [ "$queue" = "" ];do
  video="$(echo "$queue"  | sed -n '/^\s*$/!{p;q}')"
