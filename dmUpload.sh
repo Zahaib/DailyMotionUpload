@@ -98,32 +98,32 @@ fi
 [ "$LANGUAGE" = "" ] && LANGUAGE=en
 shift
 
-if [ "$multi" = "y" ]; then 
- queue=$(cat $*)
-
- until [ "$queue" = "" ];do
-  video="$(echo "$queue"  | sed -n '/^\s*$/!{p;q}')"
-  queue="$(echo "$queue" | sed '$ d')"
-  TITLE="$(echo "$video" | awk -F\" '{print $NF}')"
-  FILE="$(echo "$video" | awk '{print $(NF-1)}')"
-  TAGS="$(echo "$video" | sed "s/.*\"//;s/$FILE.*//")"
-  CATEGORY="$(echo "$video" | awk '{ print $NF })"
-  ul
- done
-else
- FILE="$1"
- TAGS="$*"
- [ "$TITLE" = "" ] && TITLE="$(basename $1)" && TITLE="${TITLE%.*}"
+[ "$multi" = "y" ] && {
+queue=$(cat $*)
+until [ "$queue" = "" ];do
+ video="$(echo "$queue"  | sed -n '/^\s*$/!{p;q}')"
+ queue="$(echo "$queue" | sed '$ d')"
+ TITLE="$(echo "$video" | awk -F\" '{print $NF}')"
+ FILE="$(echo "$video" | awk '{print $(NF-1)}')"
+ TAGS="$(echo "$video" | sed "s/.*\"//;s/$FILE.*//")"
+ CATEGORY="$(echo "$video" | awk '{ print $NF })"
  ul
-fi
-
+done
+} || {
+FILE="$1"
+TAGS="$*"
+[ "$TITLE" = "" ] && TITLE="$(basename $1)" && TITLE="${TITLE%.*}"
+ul
+}
 
 
 #TITLE=$(basename "$FILE")
-#TITLE="${TITLE%.*}" #<--- Same title as file's name
+#TITLE="${TITLE%.*}"
+#<--- Same title as file's name
 #declare -a categories=('videogames' 'music' 'fun' 'shortfilms' 'news' 'sport' 'auto' 'animals' 'people' 'webcam' 'creation' 'school' 'lifestyle' 'tech' 'travel' 'tv');
 #random=$((RANDOM%${#categories[@]}-1))
 #CATEGORY=${categories[$random]} #<--- Randomly select a category
 #declare -a languages=('en' 'cn' 'ja' 'ru' 'tr' 'pt' 'fa' 'ko' 'it' 'da' 'ur' 'vi' 'pl' 'lv' 'id' 'he' 'fr');
 #random2=$((RANDOM%${#languages[@]}-1))
-#LANGUAGE=${languages[$random2]} #<--- Randomly select a language
+#LANGUAGE=${languages[$random2]}
+#<--- Randomly select a language
