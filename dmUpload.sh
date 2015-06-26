@@ -49,6 +49,7 @@ shift $((OPTIND-1))
 
 
 ul() {
+FILE=$(realpath $FILE)
 echo -n "Getting access token..."
 
 curl -s --output out.txt --data 'grant_type=password&client_id='$APIKEY'&client_secret='$APISECRET'&username='$USERNAME'&password='$PASSWORD'&scope='$SCOPE'' https://api.dailymotion.com/oauth/token
@@ -68,14 +69,14 @@ curl -s --output out.txt -i https://api.dailymotion.com/file/upload?access_token
 upload_url=$(grep "upload_url" out.txt | cut -d: --complement -f1 | cut -d\" --complement -f1 | cut -d\" -f1 | sed 's/\\//g')
 
 lineclear
-echo -n "Getting video url..."
+echo -n "Uploading video..."
 curl -s --output out.txt --request POST \
      --form 'file=@'"$FILE" \
      "$upload_url"
 video_url=$(grep "url" out.txt | cut -d: --complement -f1-10 | cut -d\" --complement -f1 | cut -d\" -f1 | sed 's/\\//g')
 
 lineclear
-echo "Uploading video..."
+echo "Publishing video..."
 curl -s --output out.txt --request POST \
      --header "Authorization: Bearer $acc_token" \
      --form 'url='"$video_url" \
