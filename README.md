@@ -1,7 +1,7 @@
 DailyMotionUpload
 =================
 
-Bash script to upload videos to DailyMotion from command line, very simple to configure.
+Bash script to upload videos to DailyMotion from command line, very simple to use.
 
 ###Usage
 ```bash
