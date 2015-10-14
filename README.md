@@ -4,20 +4,20 @@ DailyMotionUpload
 Bash script to upload videos to DailyMotion from command line, very simple to configure.
 
 ###Usage
-```bash 
-	./dmUpload.sh -u username -p password -k api_key -s api_secret -c category [ -t "title" ] [ -l language ] video.mp4 [ tag,another tag ]
+```bash
+./dmUpload.sh -u username -p password -k api_key -s api_secret -c category [ -t "title" ] [ -l language ] video.mp4 [ tag,another tag ]
 ```
 
 
 ###Options:
 ```bash 
-	--help	Show this extremely helpful message.
+--help	Show this extremely helpful message.
 --multiple	Upload multiple videos
 ```
 
 To upload more than one video, run the program using the following syntax:
 
-```bash./dmUpload.sh -u username -p password -k api_key -s api_secret -l language --multiple list1.txt list2.txt```
+```./dmUpload.sh -u username -p password -k api_key -s api_secret -l language --multiple list1.txt list2.txt```
 
 The text files must contain the following line for every video:
 
