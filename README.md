@@ -5,7 +5,8 @@ Bash script to upload videos to DailyMotion from command line, very simple to co
 
 ###Usage
 ```bash 
-	./dmUpload.sh -u username -p password -k api_key -s api_secret -c category [ -t "title" ] [ -l language ] video.mp4 [ tag,another tag ]```
+	./dmUpload.sh -u username -p password -k api_key -s api_secret -c category [ -t "title" ] [ -l language ] video.mp4 [ tag,another tag ]
+```
 
 
 ###Options:
