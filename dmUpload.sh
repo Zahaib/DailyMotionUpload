@@ -49,7 +49,14 @@ shift $((OPTIND-1))
 
 
 ul() {
-FILE=$(realpath $FILE)
+
+FILE=$(realpath -q -m "$FILE")
+
+if [ -z "$FILE" ] | [ ! -f "$FILE" ]; then
+    echo "Video File not found: $FILE!"
+    return
+fi
+
 echo -n "Getting access token..."
 
 curl -s --output out.txt --data 'grant_type=password&client_id='$APIKEY'&client_secret='$APISECRET'&username='$USERNAME'&password='$PASSWORD'&scope='$SCOPE'' https://api.dailymotion.com/oauth/token
@@ -98,7 +105,7 @@ fi
 
 
 [ "$LANGUAGE" = "" ] && LANGUAGE=en
-shift
+# shift <- unsure what is this thing doing here, but it clears the $1 variable, thus breaking the code. (Debian 8)
 
 [ "$multi" = "y" ] && {
 set +u
@@ -126,7 +133,7 @@ ul
 #declare -a categories=('videogames' 'music' 'fun' 'shortfilms' 'news' 'sport' 'auto' 'animals' 'people' 'webcam' 'creation' 'school' 'lifestyle' 'tech' 'travel' 'tv');
 #random=$((RANDOM%${#categories[@]}-1))
 #CATEGORY=${categories[$random]} #<--- Randomly select a category
-#declare -a languages=('en' 'cn' 'ja' 'ru' 'tr' 'pt' 'fa' 'ko' 'it' 'da' 'ur' 'vi' 'pl' 'lv' 'id' 'he' 'fr');
+#declare -a languages=('en' 'cn' 'ja' 'ru' 'tr' 'pt' 'fa' 'ko' 'it' 'da' 'ur' 'vi' 'pl' 'lv' 'id' 'he' 'fr' 'hu');
 #random2=$((RANDOM%${#languages[@]}-1))
 #LANGUAGE=${languages[$random2]}
 #<--- Randomly select a language
