@@ -101,8 +101,6 @@ ul() {
       --form 'published=true' \
       "https://api.dailymotion.com/videos"
 
-  # exit
-
   video_id=$(grep "id" out.txt | cut -d: --complement -f1 | cut -d\" --complement -f1 | cut -d\" -f1 )
   error_m=$(grep "error" out.txt)
 
