@@ -21,86 +21,99 @@ SCOPE="read+write"
 echo "$*" | grep -q "\--multiple" && multi=y
 
 while getopts :u:p:k:s:t:c:l: FLAG; do 
- case "$FLAG" in
-  k)
-   APIKEY="$OPTARG"
-   ;;
-  s)
-   APISECRET="$OPTARG"
-   ;;
-  u)
-   USERNAME="$OPTARG"
-   ;;
-  p)
-   PASSWORD="$OPTARG"
-   ;;
-  t)
-   [ "$multi" = "" ] && TITLE="$OPTARG"
-   ;;
-  c)
-   [ "$multi" = "" ] && CATEGORY="$OPTARG"
-   ;;
-  l)
-   LANGUAGE="$OPTARG"
-   ;;
- esac
+  case "$FLAG" in
+    k)
+      APIKEY="$OPTARG"
+      ;;
+    s)
+      APISECRET="$OPTARG"
+      ;;
+    u)
+      USERNAME="$OPTARG"
+      ;;
+    p)
+      PASSWORD="$OPTARG"
+      ;;
+    t)
+      [ "$multi" = "" ] && TITLE="$OPTARG"
+      ;;
+    c)
+      [ "$multi" = "" ] && CATEGORY="$OPTARG"
+      ;;
+    l)
+      LANGUAGE="$OPTARG"
+      ;;
+  esac
 done
 shift $((OPTIND-1))
 
 
 ul() {
 
-FILE=$(realpath -q -m "$FILE")
+  FILE=$(realpath -q -m "$FILE")
 
-if [ -z "$FILE" ] | [ ! -f "$FILE" ]; then
-    echo "Video File not found: $FILE!"
-    return
-fi
+  if [ -z "$FILE" ] | [ ! -f "$FILE" ]; then
+      echo "Video File not found: $FILE!"
+      return
+  fi
 
-echo -n "Getting access token..."
+  echo -ne "Getting access token...\n"
 
-curl -s --output out.txt --data 'grant_type=password&client_id='$APIKEY'&client_secret='$APISECRET'&username='$USERNAME'&password='$PASSWORD'&scope='$SCOPE'' https://api.dailymotion.com/oauth/token
+  curl -s \
+    --output out.txt \
+    --data 'grant_type=password&client_id='$APIKEY'&client_secret='$APISECRET'&username='$USERNAME'&password='$PASSWORD'&scope='$SCOPE'' \
+    https://api.dailymotion.com/oauth/token
 
+  # sed -e 's/[{}]/''/g' out.txt | awk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print "\t"a[i]}'
+  # exit
 
-var1=$(grep "access_token" out.txt | cut -d: --complement -f1)
+  var1=$(grep "access_token" out.txt | cut -d: --complement -f1)
+  acc_token=$(echo $var1 | cut -d, -f1 | cut -d\" --complement -f1 | cut -d\" -f1)
 
-acc_token=$(echo $var1 | cut -d, -f1 | cut -d\" --complement -f1 | cut -d\" -f1)
-lineclear
-echo -n "Getting authorization..."
+  lineclear
+  echo -n "Getting authorization..."
 
-curl -s --output out.txt --header "Authorization: Bearer $acc_token" \
-     "https://api.dailymotion.com/file/upload"
+  curl -s --output out.txt --header "Authorization: Bearer $acc_token" \
+       "https://api.dailymotion.com/file/upload"
 
-curl -s --output out.txt -i https://api.dailymotion.com/file/upload?access_token="$acc_token"
+  # curl -s --output out.txt -i https://api.dailymotion.com/file/upload?access_token="$acc_token"
 
-upload_url=$(grep "upload_url" out.txt | cut -d: --complement -f1 | cut -d\" --complement -f1 | cut -d\" -f1 | sed 's/\\//g')
+  upload_url=$(grep "upload_url" out.txt | cut -d: --complement -f1 | cut -d\" --complement -f1 | cut -d\" -f1 | sed 's/\\//g')
 
-lineclear
-echo -n "Uploading video..."
-curl -s --output out.txt --request POST \
-     --form 'file=@'"$FILE" \
-     "$upload_url"
-video_url=$(grep "url" out.txt | cut -d: --complement -f1-10 | cut -d\" --complement -f1 | cut -d\" -f1 | sed 's/\\//g')
+  lineclear
+  echo -n "Uploading video..."
+  curl -s --output out.txt --request POST \
+       --form 'file=@'"$FILE" \
+       "$upload_url"
 
-lineclear
-echo "Publishing video..."
-curl -s --output out.txt --request POST \
-     --header "Authorization: Bearer $acc_token" \
-     --form 'url='"$video_url" \
-	 --form 'language='"$LANGUAGE" \
-     --form 'title='"$TITLE" \
-     --form 'channel='"$CATEGORY" \
-	 --form 'tags='"$TAGS" \
-     --form 'published=true' \
-     "https://api.dailymotion.com/videos"
-video_id=$(grep "id" out.txt | cut -d: --complement -f1 | cut -d\" --complement -f1 | cut -d\" -f1 )
-if [[ "$video_id" == "code" ]]
-then
-	error=$(grep "message" out.txt | cut -d: --complement -f1-3 | cut -d\" --complement -f1 | cut -d\" -f1)
-	echo "$error"
-else
-	echo "Video uploaded with id $video_id" 
-fi
+  video_url=$(sed 's/","/\n/g' out.txt | grep "url" | cut -d: --complement -f1 | cut -d\" --complement -f1 | sed 's/\\//g')
+
+  lineclear
+  echo "Publishing video..."
+
+  curl -s --output out.txt --request POST \
+      --header "Authorization: Bearer $acc_token" \
+      --form 'url='"$video_url" \
+      --form 'language='"$LANGUAGE" \
+      --form 'title='"$TITLE" \
+      --form 'channel='"$CATEGORY" \
+      --form 'tags='"$TAGS" \
+      --form 'published=true' \
+      "https://api.dailymotion.com/videos"
+
+  # exit
+
+  video_id=$(grep "id" out.txt | cut -d: --complement -f1 | cut -d\" --complement -f1 | cut -d\" -f1 )
+  error_m=$(grep "error" out.txt)
+
+  if [ -n "$error_m" ]
+  then
+    echo "Publish failed..."
+    echo $error_m
+  else
+    echo "Video uploaded with id $video_id" 
+  fi
+
 }
 
 
